@@ -26,7 +26,6 @@ async function setupDatabase() {
 
 setupDatabase().catch((error) => {
   console.error("Error setting up database:", error);
-  process.exit(1);
 });
 
 export { container as repositoriesContainer };

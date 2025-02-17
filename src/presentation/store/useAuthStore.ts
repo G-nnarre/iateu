@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { useAxios } from "@/presentation/hooks/useAxios";
+import { apiClient } from "../hooks/apiClient";
 
 interface AuthState {
   user: { id: string; email: string } | null;
@@ -10,31 +10,27 @@ interface AuthState {
   checkAuth: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => {
-  const api = useAxios();
+export const useAuthStore = create<AuthState>((set) => ({
+  user: null,
+  token: null,
+  isAuthenticated: false,
 
-  return {
-    user: null,
-    token: null,
-    isAuthenticated: false,
+  login: (user, token) => {
+    set({ user, token, isAuthenticated: true });
+  },
 
-    login: (user, token) => {
-      set({ user, token, isAuthenticated: true });
-    },
+  logout: () => {
+    set({ user: null, token: null, isAuthenticated: false });
+  },
 
-    logout: () => {
+  checkAuth: async () => {
+
+    try {
+      const res = await apiClient.get("/auth/validate");
+      set({ user: res.data, token: res.data.token, isAuthenticated: true });
+    } catch (error) {
       set({ user: null, token: null, isAuthenticated: false });
-    },
-
-    checkAuth: async () => {
-      try {
-        const res = await api.get("/auth/validate");
-        set({ user: res.data, token: res.data.token, isAuthenticated: true }); // TODO : revoir la data revnvoyé par le validate
-      } catch (error) {
-        set({ user: null, token: null, isAuthenticated: false });
-        console.log(error);
-        
-      }
-    },
-  };
-});
+      console.log(error);
+    }
+  },
+}));

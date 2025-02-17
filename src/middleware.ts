@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { NextRequest, NextResponse } from "next/server";
 import { container } from '@/infrastructure/container'
 import { TokenService } from "@/core/services/tokenService";
@@ -9,6 +10,10 @@ interface CustomNextRequest extends NextRequest {
 }
 
 export async function middleware(req:CustomNextRequest){
+  if (req.nextUrl.pathname.startsWith('/api/auth/login') || req.nextUrl.pathname.startsWith('/api/auth/signup')) {
+    return NextResponse.next();
+  }
+
   const token = req.headers.get('Authorization')?.split(' ')[1];
 
   if (!token) {
@@ -27,5 +32,5 @@ export async function middleware(req:CustomNextRequest){
 }
 
 export const config = {
-  matcher: ['/api/*', '!/api/auth/login', '!/api/auth/signin'],
+  matcher: ['/api/:path'],
 }

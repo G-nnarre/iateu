@@ -17,8 +17,8 @@ export class JWTTokenService implements TokenService {
   verify(token: string): object | null {
     try {
       return jwt.verify(token, this.secretKey) as object;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
+      console.log(error);
       return null;
     }
   }

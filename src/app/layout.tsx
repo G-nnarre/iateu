@@ -1,8 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useAuthStore } from "@/presentation/store/useAuthStore";
-import type { Metadata } from "next";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
+// RootLayout.tsx - Server Component (without "use client")
+import "reflect-metadata";
+import { Suspense } from "react";
+import { Metadata } from "next";
+import AuthCheck from "./components/authCheck";
 
 export const metadata: Metadata = {
   title: "I Ate U",
@@ -10,23 +10,13 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({children}: Readonly<{children: React.ReactNode;}>) {
-  const router = useRouter();
-  const { isAuthenticated, checkAuth} = useAuthStore();
-  
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  useEffect(() => {
-    if (!isAuthenticated && router.pathname !== "/login") {
-      router.push("/login");
-    }
-  }, [isAuthenticated]);
-
   return (
     <html>
       <body>
-          {children}
+        <Suspense fallback={<div>Loading...</div>}>
+          <AuthCheck />
+        </Suspense>
+        {children}
       </body>
     </html>
   );
